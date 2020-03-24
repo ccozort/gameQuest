@@ -1,3 +1,5 @@
+# © 2019 KidsCanCode LLC / All rights reserved.
+
 # game options/settings
 TITLE = "Jumpy!"
 WIDTH = 480

@@ -2,9 +2,14 @@
 # Jumpy! (a platform game) - Part 2
 # Video link: https://www.youtube.com/watch?v=8LRI0RLKyt0
 # Player movement
+# © 2019 KidsCanCode LLC / All rights reserved.
+
+# Week of march 23 - Lore
+# Modules, Github, import as, 
 
 import pygame as pg
-from pg.sprite import Sprite
+from pygame.sprite import Sprite
+# from pg.sprite import Sprite
 import random
 from settings import *
 from sprites import *
