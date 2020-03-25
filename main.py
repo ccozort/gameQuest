@@ -5,11 +5,11 @@
 # © 2019 KidsCanCode LLC / All rights reserved.
 
 # Week of march 23 - Lore
-# Modules, Github, import as, 
+# Modularity, Github, import as, 
 
 import pygame as pg
-from pygame.sprite import Sprite
-# from pg.sprite import Sprite
+from pygame.sprite import Group
+# from pg.sprite import Group
 import random
 from settings import *
 from sprites import *
@@ -26,9 +26,10 @@ class Game:
 
     def new(self):
         # start a new game
-        self.all_sprites = pg.sprite.Group()
+        self.all_sprites = Group()
         self.player = Player()
         self.all_sprites.add(self.player)
+        self.platforms = pg.sprite.Group()
         self.run()
 
     def run(self):
