@@ -36,6 +36,8 @@ class Game:
         self.platforms.add(ground)
         self.all_sprites.add(plat1)
         self.platforms.add(plat1)
+        # self.all_sprites.add(plat2)
+        # self.platforms.add(plat2)
         self.run()
 
     def run(self):
