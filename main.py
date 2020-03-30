@@ -62,7 +62,7 @@ class Game:
         if hits:
             if self.player.rect.top > hits[0].rect.top:
                 print("i hit my head")
-                self.player.vel.y = 10
+                self.player.vel.y = 15
                 self.player.rect.top = hits[0].rect.bottom + 5
                 self.player.hitpoints -= 10
                 print(self.player.hitpoints)
