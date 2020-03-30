@@ -19,6 +19,7 @@ class Player(Sprite):
         self.pos = vec(WIDTH / 2, HEIGHT / 2)
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
+        self.hitpoints = 100
     def myMethod(self):
         pass
     def jump(self):

@@ -64,6 +64,8 @@ class Game:
                 print("i hit my head")
                 self.player.vel.y = 10
                 self.player.rect.top = hits[0].rect.bottom + 5
+                self.player.hitpoints -= 10
+                print(self.player.hitpoints)
             # print("it collided")
             else:
                 self.player.vel.y = 0
