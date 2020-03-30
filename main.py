@@ -39,10 +39,10 @@ class Game:
         self.platforms.add(plat1)
         self.all_sprites.add(plat2)
         self.platforms.add(plat2)
-        for plat in range(1,10):
-            plat = Platform(random.randint(0, WIDTH), random.randint(0, HEIGHT), 200, 20)
-            self.all_sprites.add(plat)
-            self.platforms.add(plat)
+        # for plat in range(1,10):
+        #     plat = Platform(random.randint(0, WIDTH), random.randint(0, HEIGHT), 200, 20)
+        #     self.all_sprites.add(plat)
+        #     self.platforms.add(plat)
         self.run()
 
 
@@ -60,9 +60,14 @@ class Game:
         self.all_sprites.update()
         hits = pg.sprite.spritecollide(self.player, self.platforms, False)
         if hits:
+            if self.player.rect.top > hits[0].rect.top:
+                print("i hit my head")
+                self.player.vel.y = 10
+                self.player.rect.top = hits[0].rect.bottom + 5
             # print("it collided")
-            self.player.vel.y = 0
-            self.player.pos.y = hits[0].rect.top+1
+            else:
+                self.player.vel.y = 0
+                self.player.pos.y = hits[0].rect.top+1
             
 
     def events(self):
