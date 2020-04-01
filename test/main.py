@@ -27,24 +27,34 @@ class Game:
     def new(self):
         # start a new game
         self.all_sprites = Group()
-        self.platforms = pg.sprite.Group()
+        self.platforms = Group()
+        self.statics = Group()
+        self.projectiles = Group()
         self.player = Player(self)
         self.all_sprites.add(self.player)
         ground = Platform(0, HEIGHT-40, WIDTH, 40)
-        plat1 = Platform(200, 400, 150, 20)
-        plat2 = Platform(150, 300, 150, 20)
+        # plat1 = Platform(200, 400, 150, 20)
+        # plat2 = Platform(150, 300, 150, 20)
         self.all_sprites.add(ground)
         self.platforms.add(ground)
-        self.all_sprites.add(plat1)
-        self.platforms.add(plat1)
-        self.all_sprites.add(plat2)
-        self.platforms.add(plat2)
-        # for plat in range(1,10):
-        #     plat = Platform(random.randint(0, WIDTH), random.randint(0, HEIGHT), 200, 20)
-        #     self.all_sprites.add(plat)
-        #     self.platforms.add(plat)
+        self.tempGroup = Group()
+        # self.all_sprites.add(plat1)
+        # self.platforms.add(plat1)
+        # self.all_sprites.add(plat2)
+        # self.platforms.add(plat2)
+        for plat in range(1,10):
+            plat = Platform(random.randint(15, WIDTH-400), random.randint(200, HEIGHT), random.randint(50,100), 20)
+            self.tempGroup.add(plat)
+            for current in self.tempGroup:
+                platHits = pg.sprite.spritecollide(plat, self.platforms, True)
+                if platHits:
+                    plat.kill()
+                else:
+                    self.all_sprites.add(plat)
+                    self.platforms.add(plat)
+                    
+            
         self.run()
-
 
     def run(self):
         # Game Loop
@@ -56,17 +66,18 @@ class Game:
             self.draw()
 
     def update(self):
-        # Game Loop - Update
+        # Update - listen to see if anything changes...
         self.all_sprites.update()
+        for p in self.projectiles:
+            if p.rect.y < 0:
+                p.kill()
+                # print(self.projectiles)
         hits = pg.sprite.spritecollide(self.player, self.platforms, False)
         if hits:
             if self.player.rect.top > hits[0].rect.top:
-                print("i hit my head")
+                # print("i hit my head")
                 self.player.vel.y = 15
                 self.player.rect.top = hits[0].rect.bottom + 5
-                self.player.hitpoints -= 10
-                print(self.player.hitpoints)
-            # print("it collided")
             else:
                 self.player.vel.y = 0
                 self.player.pos.y = hits[0].rect.top+1
@@ -76,6 +87,7 @@ class Game:
                 plat.rect.y += abs(self.player.vel.y)
                 if plat.rect.top >= HEIGHT:
                     plat.kill()
+                    print(len(self.platforms))
 
     def events(self):
         # Game Loop - events

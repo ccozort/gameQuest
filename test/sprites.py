@@ -22,6 +22,12 @@ class Player(Sprite):
         self.hitpoints = 100
     def myMethod(self):
         pass
+    def pew(self):
+        lazer = Pewpew(self.pos.x, self.pos.y, 10, 10)
+        # print("trying to pewpewpew")
+        self.game.all_sprites.add(lazer)
+        # self.game.platforms.add(lazer)
+        self.game.projectiles.add(lazer)
     def jump(self):
         self.rect.x += 1
         hits = pg.sprite.spritecollide(self, self.game.platforms, False)
@@ -36,7 +42,7 @@ class Player(Sprite):
         if keys[pg.K_d]:
             self.acc.x = PLAYER_ACC
         if keys[pg.K_w]:
-            pass
+            self.pew()
             # self.acc.y = -PLAYER_ACC
         if keys[pg.K_s]:
             self.acc.y = PLAYER_ACC
@@ -69,3 +75,14 @@ class Platform(Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+
+class Pewpew(Sprite):
+    def __init__(self, x, y, w, h):
+        Sprite.__init__(self)
+        self.image = pg.Surface((w, h))
+        self.image.fill(RED)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+    def update(self):
+        self.rect.y -= 5
