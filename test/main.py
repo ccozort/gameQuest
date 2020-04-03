@@ -34,7 +34,7 @@ class Game:
         self.projectiles = Group()
         self.player = Player(self)
         self.all_sprites.add(self.player)
-        ground = Platform(0, HEIGHT-40, WIDTH, 40)
+        ground = Platform(self, 0, HEIGHT-40, WIDTH, 40)
         # plat1 = Platform(200, 400, 150, 20)
         # plat2 = Platform(150, 300, 150, 20)
         self.all_sprites.add(ground)
@@ -46,16 +46,16 @@ class Game:
         # self.all_sprites.add(plat2)
         # self.platforms.add(plat2)
         # generates platforms that don't touch each other...
-        # cite sources...wwwad a
+        # cite sources...
         for plat in range(0, 10):
             if len(self.platforms) < 2:
-                plat = Platform(random.randint(0,WIDTH-100), random.randint(0,HEIGHT-100), 100, 15)
+                plat = Platform(self, random.randint(0,WIDTH-100), random.randint(0,HEIGHT-100), 100, 15)
                 self.platforms.add(plat)
                 self.all_sprites.add(plat)
                 # print(self.platforms)
             # break
             while True:
-                newPlat = Platform(random.randint(0,WIDTH-100), random.randint(0,HEIGHT-100), 100, 15)
+                newPlat = Platform(self, random.randint(0,WIDTH-100), random.randint(0,HEIGHT-100), 100, 15)
                 self.tempGroup.add(newPlat)
                 selfCollide = pg.sprite.groupcollide(self.tempGroup, self.platforms, True, False)
                 allCollide = pg.sprite.groupcollide(self.tempGroup, self.all_sprites, True, False)
@@ -65,14 +65,27 @@ class Game:
                     self.tempGroup.remove(newPlat)
                     # print(len(self.tempGroup))
                     break
-        for monster in range(0,5):
-            for plat in self.platforms:
-                monster = Monster(self)
-                monster.pos.y = plat.rect.y
-                monster.pos.x = plat.rect.x
-                self.monsters.add(monster)
-                self.all_sprites.add(monster)
+
         self.run()
+    def platGen(self):
+        for plat in range(0, 15):
+            if len(self.platforms) < 2:
+                plat = Platform(self, random.randint(0,WIDTH-100), random.randint(0,HEIGHT-100), 100, 15)
+                self.platforms.add(plat)
+                self.all_sprites.add(plat)
+                # print(self.platforms)
+            # break
+            while True:
+                newPlat = Platform(self, random.randint(0,WIDTH-100), random.randint(0,HEIGHT-100), 100, 15)
+                self.tempGroup.add(newPlat)
+                selfCollide = pg.sprite.groupcollide(self.tempGroup, self.platforms, True, False)
+                allCollide = pg.sprite.groupcollide(self.tempGroup, self.all_sprites, True, False)
+                if not selfCollide and not allCollide:
+                    self.platforms.add(newPlat)
+                    self.all_sprites.add(newPlat)
+                    self.tempGroup.remove(newPlat)
+                    # print(len(self.tempGroup))
+                    break
     def run(self):
         # Game Loop
         self.playing = True
@@ -89,9 +102,10 @@ class Game:
             if p.rect.y < 0:
                 p.kill()
                 # print(self.projectiles)
-        phits = pg.sprite.groupcollide(self.projectiles, self.platforms, True, True)
+        phits = pg.sprite.groupcollide(self.projectiles, self.platforms, False, False)
         if phits:
-            print("a projectile collided with a plat...")
+            pass
+            # print("a projectile collided with a plat...")
         hits = pg.sprite.spritecollide(self.player, self.platforms, False)
         if hits:
             if self.player.rect.top > hits[0].rect.top:
@@ -108,6 +122,8 @@ class Game:
                 if plat.rect.top >= HEIGHT:
                     plat.kill()
                     print(len(self.platforms))
+        if len(self.platforms) < 10:
+            self.platGen()     
     def events(self):
         # Game Loop - events
         for event in pg.event.get():

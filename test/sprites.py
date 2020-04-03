@@ -23,18 +23,17 @@ class Player(Sprite):
         self.acc = vec(0, 0)
         self.hitpoints = 100
     def pew(self):
-        lazer = Pewpew(self.game, self.pos.x + self.rect.width/2, self.pos.y, 10, 10)
+        lazer = Pewpew(self.game, self.pos.x + self.rect.width/2, self.rect.top, 10, 10)
         # print("trying to pewpewpew")
         self.game.all_sprites.add(lazer)
-        # self.game.platforms.add(lazer)
+        self.game.platforms.add(lazer)
         self.game.projectiles.add(lazer)
-        
     def jump(self):
         self.rect.x += 1
         hits = pg.sprite.spritecollide(self, self.game.platforms, False)
         self.rect.x -= 1
         if hits: 
-            self.vel.y = -15
+            self.vel.y = -30
     def update(self):
         self.acc = vec(0, 0.5)
         keys = pg.key.get_pressed()
@@ -81,31 +80,36 @@ class Monster(Sprite):
         self.hitpoints = 100        
         self.rect.midbottom = self.pos
     def update(self):
-        self.acc = vec(0, 0.5)
+        # self.acc = vec(0.5, 0)
         # apply friction
-        self.acc.x += self.vel.x * PLAYER_FRICTION
+        self.acc.x += self.vel.x * MONSTER_FRICTION
         # self.acc.y += self.vel.y * PLAYER_FRICTION
         # equations of motion
         self.vel += self.acc
         self.pos += self.vel + 0.5 * self.acc
         # wrap around the sides of the screen
-        if self.pos.x > WIDTH:
-            self.pos.x = 0
-        if self.pos.x < 0:
-            self.pos.x = WIDTH
-        if self.pos.y < 0:
-            self.pos.y = HEIGHT
-        if self.pos.y > HEIGHT:
-            self.pos.y = 0
         self.rect.midbottom = self.pos 
 class Platform(Sprite):
-    def __init__(self, x, y, w, h):
+    def __init__(self, game, x, y, w, h):
         Sprite.__init__(self)
+        self.game = game
         self.image = pg.Surface((w, h))
         self.image.fill(WHITE)
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+        self.mob = Monster(self.game)
+        self.mob.pos = self.rect.midtop
+        self.spawn()
+    def spawn(self):
+        self.game.all_sprites.add(self.mob)
+        self.game.monsters.add(self.mob)
+    def update(self):
+        self.acc = vec(0.1, 0)
+        if self.mob.pos.x < self.rect.left:
+            self.mob.vel.x *= -1
+        if self.mob.pos.x > self.rect.right:
+            self.mob.vel.x *= -1
 
 class Pewpew(Sprite):
     def __init__(self, game, x, y, w, h):
@@ -117,10 +121,10 @@ class Pewpew(Sprite):
         self.rect.x = x
         self.rect.y = y
         self.birth = time.perf_counter_ns()
-        self.lifespan = 1000000000
+        self.lifespan = 3000000000
 
     def update(self):
-        self.rect.y -= 5
+        # self.rect.y -= 5
         self.now = time.perf_counter_ns()
         if self.now - self.birth > self.lifespan:
             self.kill()
