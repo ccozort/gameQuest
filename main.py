@@ -5,7 +5,9 @@
 # © 2019 KidsCanCode LLC / All rights reserved.
 
 # Week of march 23 - Lore
-# Modularity, Github, import as, 
+# Modularity, Github, import as
+# Modularity is file dependencies
+# Classes, methods, functions, data types, ...
 
 import pygame as pg
 from pygame.sprite import Group
@@ -28,9 +30,12 @@ class Game:
     def new(self):
         # start a new game
         self.all_sprites = Group()
-        self.platforms = pg.sprite.Group()
+        self.platforms = Group()
+        self.healthbars = Group()
         self.player = Player(self)
+        self.healthbar = Healthbar(self, 15, 15, self.player.hitpoints, 25)
         self.all_sprites.add(self.player)
+        self.all_sprites.add(self.healthbar)
         ground = Platform(0, HEIGHT-40, WIDTH, 40)
         plat1 = Platform(200, 400, 150, 20)
         plat2 = Platform(150, 300, 150, 20)
@@ -44,10 +49,10 @@ class Game:
         # you need to add new instances of the platform class to groups or it wont update or draw
         self.all_sprites.add(plat3)
         self.platforms.add(plat3)
-        # for plat in range(1,10):
-        #     plat = Platform(random.randint(0, WIDTH), random.randint(0, HEIGHT), 200, 20)
-        #     self.all_sprites.add(plat)
-        #     self.platforms.add(plat)
+        for plat in range(1,10):
+            plat = Platform(random.randint(0, WIDTH), random.randint(0, HEIGHT), 200, 20)
+            self.all_sprites.add(plat)
+            self.platforms.add(plat)
         self.run()
 
 
@@ -63,6 +68,7 @@ class Game:
     def update(self):
         # Game Loop - Update
         self.all_sprites.update()
+        self.healthbars.update()
         hits = pg.sprite.spritecollide(self.player, self.platforms, False)
         if hits:
             if self.player.rect.top > hits[0].rect.top:
@@ -70,7 +76,7 @@ class Game:
                 self.player.vel.y = 15
                 self.player.rect.top = hits[0].rect.bottom + 5
                 self.player.hitpoints -= 10
-                print(self.player.hitpoints)
+                # print(self.player.hitpoints)
             # print("it collided")
             else:
                 self.player.vel.y = 0
@@ -89,6 +95,7 @@ class Game:
     def draw(self):
         # Game Loop - draw
         self.screen.fill(BLACK)
+        self.healthbars.draw(self.screen)
         self.all_sprites.draw(self.screen)
         # *after* drawing everything, flip the display
         pg.display.flip()
