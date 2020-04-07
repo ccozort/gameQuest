@@ -33,19 +33,23 @@ class Player(Sprite):
         hits = pg.sprite.spritecollide(self, self.game.platforms, False)
         self.rect.x -= 1
         if hits: 
-            self.vel.y = -30
+            self.acc.y = -10
     def update(self):
         self.acc = vec(0, 0.5)
         keys = pg.key.get_pressed()
         if keys[pg.K_a]:
             self.acc.x = -PLAYER_ACC
+            print(self.acc.x)
+            print(self.acc)
+            print(self.acc.x)
         if keys[pg.K_d]:
             self.acc.x = PLAYER_ACC
         if keys[pg.K_w]:
             self.pew()
             # self.acc.y = -PLAYER_ACC
         if keys[pg.K_s]:
-            self.acc.y = PLAYER_ACC
+            pass
+            # self.acc.y = PLAYER_ACC
         # ALERT - Mr. Cozort did this WAY differently than Mr. Bradfield...
         if keys[pg.K_SPACE]:
             self.jump()
@@ -80,15 +84,17 @@ class Monster(Sprite):
         self.hitpoints = 100        
         self.rect.midbottom = self.pos
     def update(self):
+        pass
         # self.acc = vec(0.5, 0)
         # apply friction
-        self.acc.x += self.vel.x * MONSTER_FRICTION
-        # self.acc.y += self.vel.y * PLAYER_FRICTION
-        # equations of motion
-        self.vel += self.acc
-        self.pos += self.vel + 0.5 * self.acc
-        # wrap around the sides of the screen
-        self.rect.midbottom = self.pos 
+        # self.acc.x += self.vel.x * MONSTER_FRICTION
+        # # self.acc.y += self.vel.y * PLAYER_FRICTION
+        # # equations of motion
+        # self.vel += self.acc
+        # self.pos += self.vel + 0.5 * self.acc
+        # # wrap around the sides of the screen
+        # # self.vel.x += 5
+        # self.rect.midbottom = self.pos 
 class Platform(Sprite):
     def __init__(self, game, x, y, w, h):
         Sprite.__init__(self)
@@ -105,11 +111,14 @@ class Platform(Sprite):
         self.game.all_sprites.add(self.mob)
         self.game.monsters.add(self.mob)
     def update(self):
-        self.acc = vec(0.1, 0)
-        if self.mob.pos.x < self.rect.left:
-            self.mob.vel.x *= -1
-        if self.mob.pos.x > self.rect.right:
-            self.mob.vel.x *= -1
+        if self.mob.rect.x > self.rect.width:
+            self.mob.acc.x = -0.1
+        if self.mob.rect.x < self.rect.x:
+            self.mob.acc.x = 0.1
+        self.mob.vel += self.mob.acc
+        self.mob.pos += self.mob.vel + 0.5 * self.mob.acc
+        self.mob.acc = vec(0,0)
+        self.mob.rect.midbottom = self.mob.pos
 
 class Pewpew(Sprite):
     def __init__(self, game, x, y, w, h):

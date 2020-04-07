@@ -14,6 +14,7 @@ import random
 from settings import *
 from sprites import *
 
+# this is the game class, we create a new game at the bottom of the code...
 class Game:
     def __init__(self):
         # initialize game window, etc
@@ -33,12 +34,16 @@ class Game:
         ground = Platform(0, HEIGHT-40, WIDTH, 40)
         plat1 = Platform(200, 400, 150, 20)
         plat2 = Platform(150, 300, 150, 20)
+        plat3 = Platform(10, 200, 400, 20)
         self.all_sprites.add(ground)
         self.platforms.add(ground)
         self.all_sprites.add(plat1)
         self.platforms.add(plat1)
         self.all_sprites.add(plat2)
         self.platforms.add(plat2)
+        # you need to add new instances of the platform class to groups or it wont update or draw
+        self.all_sprites.add(plat3)
+        self.platforms.add(plat3)
         # for plat in range(1,10):
         #     plat = Platform(random.randint(0, WIDTH), random.randint(0, HEIGHT), 200, 20)
         #     self.all_sprites.add(plat)
