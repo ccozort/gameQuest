@@ -20,8 +20,6 @@ class Player(Sprite):
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
         self.hitpoints = 100
-    def myMethod(self):
-        pass
     def jump(self):
         self.rect.x += 1
         hits = pg.sprite.spritecollide(self, self.game.platforms, False)
@@ -43,7 +41,6 @@ class Player(Sprite):
         # ALERT - Mr. Cozort did this WAY differently than Mr. Bradfield...
         if keys[pg.K_SPACE]:
             self.jump()
-
         # apply friction
         self.acc.x += self.vel.x * PLAYER_FRICTION
         # self.acc.y += self.vel.y * PLAYER_FRICTION
@@ -70,21 +67,14 @@ class Platform(Sprite):
         self.rect.x = x
         self.rect.y = y
         self.vx = 1
+    def blitme(self, x, y):
+        self.screen.blit(self.image, (x, y))
     def update(self):
-        self.rect.x += self.vx
-        if self.rect.x + self.rect.width > WIDTH or self.rect.x < 0:
-            self.vx*=-1
+        pass
+        # self.rect.x += self.vx
+        # self.rect.w-=1 
+        # if self.rect.x + self.rect.width > WIDTH or self.rect.x < 0:
+        #     self.vx*=-1
 # created a healthbar and tied it to players hitpoints
 # I added it to the main.py under new, and it won't change its width
 # I think I need to add a blit to update the graphic
-class Healthbar(Sprite):
-    def __init__(self, game, x, y, w, h):
-        Sprite.__init__(self)
-        self.game = game
-        self.image = pg.Surface((w, h))
-        self.image.fill(RED)
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
-    def update(self):
-        self.game.screen.blit(self.image(self.game.player.hitpoints, 25))

@@ -16,6 +16,33 @@ import random
 from settings import *
 from sprites import *
 
+
+# Fancy HUD functions
+def draw_player_health(surf, x, y, pct):
+    if pct < 0:
+        pct = 0
+    BAR_LENGTH = 100
+    BAR_HEIGHT = 20
+    fill = pct * BAR_LENGTH
+    outline_rect = pg.Rect(x, y, BAR_LENGTH, BAR_HEIGHT)
+    fill_rect = pg.Rect(x, y, fill, BAR_HEIGHT)
+    if pct > 0.6:
+        col = GREEN
+    elif pct > 0.3:
+        col = YELLOW
+    else:
+        col = RED
+    pg.draw.rect(surf, col, fill_rect)
+    pg.draw.rect(surf, WHITE, outline_rect, 2)
+# basic health bar
+
+# basic HUD functions
+# def draw_player_health(surf, x, y, w):
+#     outline_rect = pg.Rect(x, y, 100, 20)
+#     fill_rect = pg.Rect(x, y, w, 20)
+#     pg.draw.rect(surf, RED, fill_rect)
+#     pg.draw.rect(surf, WHITE, outline_rect, 2)
+
 # this is the game class, we create a new game at the bottom of the code...
 class Game:
     def __init__(self):
@@ -31,11 +58,8 @@ class Game:
         # start a new game
         self.all_sprites = Group()
         self.platforms = Group()
-        self.healthbars = Group()
         self.player = Player(self)
-        self.healthbar = Healthbar(self, 15, 15, self.player.hitpoints, 25)
         self.all_sprites.add(self.player)
-        self.all_sprites.add(self.healthbar)
         ground = Platform(0, HEIGHT-40, WIDTH, 40)
         plat1 = Platform(200, 400, 150, 20)
         plat2 = Platform(150, 300, 150, 20)
@@ -68,14 +92,14 @@ class Game:
     def update(self):
         # Game Loop - Update
         self.all_sprites.update()
-        self.healthbars.update()
         hits = pg.sprite.spritecollide(self.player, self.platforms, False)
         if hits:
             if self.player.rect.top > hits[0].rect.top:
                 print("i hit my head")
                 self.player.vel.y = 15
                 self.player.rect.top = hits[0].rect.bottom + 5
-                self.player.hitpoints -= 10
+                self.player.hitpoints -= 5
+                print("hitpoints are now " + str(self.player.hitpoints))
                 # print(self.player.hitpoints)
             # print("it collided")
             else:
@@ -95,8 +119,8 @@ class Game:
     def draw(self):
         # Game Loop - draw
         self.screen.fill(BLACK)
-        self.healthbars.draw(self.screen)
         self.all_sprites.draw(self.screen)
+        draw_player_health(self.screen, 10, 10, self.player.hitpoints/100)
         # *after* drawing everything, flip the display
         pg.display.flip()
 
@@ -109,9 +133,9 @@ class Game:
         pass
 
 g = Game()
-g.show_start_screen()
+# g.show_start_screen()
 while g.running:
     g.new()
-    g.show_go_screen()
+    # g.show_go_screen()
 
 pg.quit()
