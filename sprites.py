@@ -5,6 +5,8 @@
 import pygame as pg
 from pygame.sprite import Sprite
 from settings import *
+import random
+from random import randint
 vec = pg.math.Vector2
 
 class Player(Sprite):
@@ -75,6 +77,23 @@ class Platform(Sprite):
         # self.rect.w-=1 
         # if self.rect.x + self.rect.width > WIDTH or self.rect.x < 0:
         #     self.vx*=-1
+class Post(Sprite):
+    def __init__(self, x, y, w, h):
+        Sprite.__init__(self)
+        self.image = pg.Surface((w, h))
+        self.image.fill(RED)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.vx = -1
+    def blitme(self, x, y):
+        self.screen.blit(self.image, (x, y))
+    def update(self):
+        self.rect.x += self.vx
+        if self.rect.x < 0:
+            # self.kill()
+            self.rect.x = WIDTH
+            self.rect.height = random.randint(10,35)
 # created a healthbar and tied it to players hitpoints
 # I added it to the main.py under new, and it won't change its width
 # I think I need to add a blit to update the graphic

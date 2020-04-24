@@ -9,39 +9,77 @@ from pygame.sprite import Sprite
 from settings import *
 vec = pg.math.Vector2
 
+class Spritesheet:
+    def __init__(self, filename):
+        self.spritesheet = pg.image.load(filename).convert()
+    def get_image(self, x, y, width, height, scale):
+        image = pg.Surface((width, height))
+        image.blit(self.spritesheet, (0,0), (x,y,width, height))
+        image = pg.transform.scale(image, (int(width*scale), int(height*scale)))
+        return image
 class Player(Sprite):
     # include game parameter to pass game class as argument in main...
     def __init__(self, game):
         Sprite.__init__(self)
         self.game = game
-        self.image = pg.Surface((30, 40))
-        self.image.fill(BLUE)
+        self.walking = False
+        self.jumping = False
+        self.current_frame = 0
+        self.last_update = 0
+        self.load_images()
+        self.image = self.standing_frames[0]
+        # self.image = pg.Surface((30, 40))
+        # self.image = self.game.spritesheet.get_image(0,0,32,32, 1)
+        self.image.set_colorkey(BLACK)
+        # self.image.fill(BLUE)
         self.rect = self.image.get_rect()
         self.rect.center = (WIDTH / 2, HEIGHT / 2)
         self.pos = vec(WIDTH / 2, HEIGHT / 2)
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
         self.hitpoints = 100
+    def load_images(self):
+        self.standing_frames = [self.game.spritesheet.get_image(0, 0, 32, 32, 2),
+                                self.game.spritesheet.get_image(32, 0, 32, 32, 2)]
+        for frame in self.standing_frames:
+            frame.set_colorkey(BLACK)
+        # self.walk_frames_r = [self.game.spritesheet.get_image(678, 860, 120, 201),
+        #                       self.game.spritesheet.get_image(692, 1458, 120, 207)]
+        # self.walk_frames_l = []
+        # for frame in self.walk_frames_r:
+        #     frame.set_colorkey(BLACK)
+        #     self.walk_frames_l.append(pg.transform.flip(frame, True, False))
+        # self.jump_frame = self.game.spritesheet.get_image(382, 763, 150, 181)
+        # self.jump_frame.set_colorkey(BLACK)
     def pew(self):
-        lazer = Pewpew(self.game, self.pos.x + self.rect.width/2, self.rect.top, 10, 10)
-        # print("trying to pewpewpew")
-        self.game.all_sprites.add(lazer)
-        self.game.platforms.add(lazer)
-        self.game.projectiles.add(lazer)
+        if len(self.game.projectiles) > 5:
+            lazer = Pewpew(self.game, self.pos.x + self.rect.width/2, self.rect.top, 10, 10)
+            # print("trying to pewpewpew")
+            self.game.all_sprites.add(lazer)
+            # self.game.platforms.add(lazer)
+            self.game.projectiles.add(lazer)
     def jump(self):
         self.rect.x += 1
         hits = pg.sprite.spritecollide(self, self.game.platforms, False)
         self.rect.x -= 1
         if hits: 
-            self.acc.y = -10
+            self.acc.y = -PLAYER_JUMPPOWER
+    def animate(self):
+        now = pg.time.get_ticks()
+        if not self.jumping and not self.walking:
+            if now - self.last_update > 350:
+                self.last_update = now
+                self.current_frame = (self.current_frame + 1) % len(self.standing_frames)
+                bottom = self.rect.bottom
+                self.image = self.standing_frames[self.current_frame]
+                self.rect = self.image.get_rect()
+                self.rect.bottom = bottom
     def update(self):
+        self.animate()
         self.acc = vec(0, 0.5)
         keys = pg.key.get_pressed()
         if keys[pg.K_a]:
             self.acc.x = -PLAYER_ACC
-            print(self.acc.x)
-            print(self.acc)
-            print(self.acc.x)
         if keys[pg.K_d]:
             self.acc.x = PLAYER_ACC
         if keys[pg.K_w]:
@@ -64,18 +102,24 @@ class Player(Sprite):
             self.pos.x = 0
         if self.pos.x < 0:
             self.pos.x = WIDTH
-        if self.pos.y < 0:
-            self.pos.y = HEIGHT
-        if self.pos.y > HEIGHT:
-            self.pos.y = 0
+        # if self.pos.y < 0:
+        #     self.pos.y = HEIGHT
+        # if self.pos.y > HEIGHT:
+        #     self.pos.y = 0
         self.rect.midbottom = self.pos
 class Monster(Sprite):
     # include game parameter to pass game class as argument in main...
     def __init__(self, game):
         Sprite.__init__(self)
         self.game = game
-        self.image = pg.Surface((30, 40))
-        self.image.fill(LIGHTGREEN)
+        # self.image = pg.Surface((30, 40))
+        self.walking = False
+        self.jumping = False
+        self.load_images()
+        self.last_update = 0
+        self.current_frame = 0
+        self.image = self.standing_frames[0]
+        # self.image.fill(LIGHTGREEN)
         self.rect = self.image.get_rect()
         self.rect.center = (WIDTH / 2, HEIGHT / 2)
         self.pos = vec(WIDTH / 2, HEIGHT / 2)
@@ -83,6 +127,22 @@ class Monster(Sprite):
         self.acc = vec(0.5, 0)
         self.hitpoints = 100        
         self.rect.midbottom = self.pos
+        
+    def load_images(self):
+        self.standing_frames = [self.game.spritesheet.get_image(0, 160, 32, 32, 2),
+                                self.game.spritesheet.get_image(32, 160, 32, 32, 2)]
+        for frame in self.standing_frames:
+            frame.set_colorkey(BLACK)
+    def animate(self):
+        now = pg.time.get_ticks()
+        if not self.jumping and not self.walking:
+            if now - self.last_update > 350:
+                self.last_update = now
+                self.current_frame = (self.current_frame + 1) % len(self.standing_frames)
+                bottom = self.rect.bottom
+                self.image = self.standing_frames[self.current_frame]
+                self.rect = self.image.get_rect()
+                self.rect.bottom = bottom
     def update(self):
         pass
         # self.acc = vec(0.5, 0)
@@ -99,8 +159,10 @@ class Platform(Sprite):
     def __init__(self, game, x, y, w, h):
         Sprite.__init__(self)
         self.game = game
-        self.image = pg.Surface((w, h))
-        self.image.fill(WHITE)
+        # self.image = pg.Surface((w, h))
+        self.image = self.game.spritesheet.get_image(0,256,64,16, 1)
+        self.image.set_colorkey(BLACK)
+        # self.image.fill(WHITE)
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -108,18 +170,23 @@ class Platform(Sprite):
         self.mob.pos = self.rect.midtop
         self.spawn()
     def spawn(self):
+        # self.mob.animate()
         self.game.all_sprites.add(self.mob)
         self.game.monsters.add(self.mob)
+        
     def update(self):
-        if self.mob.rect.x > self.rect.width:
-            self.mob.acc.x = -0.1
-        if self.mob.rect.x < self.rect.x:
-            self.mob.acc.x = 0.1
-        self.mob.vel += self.mob.acc
-        self.mob.pos += self.mob.vel + 0.5 * self.mob.acc
-        self.mob.acc = vec(0,0)
-        self.mob.rect.midbottom = self.mob.pos
-
+        # pass
+        self.mob.animate()
+        self.mob.x = self.rect.x
+        self.mob.y = self.rect.y
+        # if self.mob.rect.x > self.rect.width:
+        #     self.mob.acc.x = -0.1
+        # if self.mob.rect.x < self.rect.x:
+        #     self.mob.acc.x = 0.1
+        # self.mob.vel += self.mob.acc
+        # self.mob.pos += self.mob.vel + 0.5 * self.mob.acc
+        # self.mob.acc = vec(0,0)
+        self.mob.rect.midbottom = self.rect.midtop
 class Pewpew(Sprite):
     def __init__(self, game, x, y, w, h):
         Sprite.__init__(self)
