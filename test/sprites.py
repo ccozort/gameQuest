@@ -12,10 +12,10 @@ vec = pg.math.Vector2
 class Spritesheet:
     def __init__(self, filename):
         self.spritesheet = pg.image.load(filename).convert()
-    def get_image(self, x, y, width, height, scale):
+    def get_image(self, x, y, width, height, xscale, yscale):
         image = pg.Surface((width, height))
         image.blit(self.spritesheet, (0,0), (x,y,width, height))
-        image = pg.transform.scale(image, (int(width*scale), int(height*scale)))
+        image = pg.transform.scale(image, (int(width*xscale), int(height*yscale)))
         return image
 class Player(Sprite):
     # include game parameter to pass game class as argument in main...
@@ -39,8 +39,8 @@ class Player(Sprite):
         self.acc = vec(0, 0)
         self.hitpoints = 100
     def load_images(self):
-        self.standing_frames = [self.game.spritesheet.get_image(0, 0, 32, 32, 2),
-                                self.game.spritesheet.get_image(32, 0, 32, 32, 2)]
+        self.standing_frames = [self.game.spritesheet.get_image(0, 0, 32, 32, 2, 2),
+                                self.game.spritesheet.get_image(32, 0, 32, 32, 2, 2)]
         for frame in self.standing_frames:
             frame.set_colorkey(BLACK)
         # self.walk_frames_r = [self.game.spritesheet.get_image(678, 860, 120, 201),
@@ -121,16 +121,15 @@ class Monster(Sprite):
         self.image = self.standing_frames[0]
         # self.image.fill(LIGHTGREEN)
         self.rect = self.image.get_rect()
-        self.rect.center = (WIDTH / 2, HEIGHT / 2)
-        self.pos = vec(WIDTH / 2, HEIGHT / 2)
-        self.vel = vec(0, 0)
-        self.acc = vec(0.5, 0)
+        # self.rect.center = (WIDTH / 2, HEIGHT / 2)
+        # self.pos = vec(WIDTH / 2, HEIGHT / 2)
+        # self.vel = vec(0, 0)
+        # self.acc = vec(0.5, 0)
         self.hitpoints = 100        
-        self.rect.midbottom = self.pos
-        
+        # self.rect.midbottom = self.pos
     def load_images(self):
-        self.standing_frames = [self.game.spritesheet.get_image(0, 160, 32, 32, 2),
-                                self.game.spritesheet.get_image(32, 160, 32, 32, 2)]
+        self.standing_frames = [self.game.spritesheet.get_image(0, 160, 32, 32, 2, 2),
+                                self.game.spritesheet.get_image(32, 160, 32, 32, 2, 2)]
         for frame in self.standing_frames:
             frame.set_colorkey(BLACK)
     def animate(self):
@@ -160,32 +159,21 @@ class Platform(Sprite):
         Sprite.__init__(self)
         self.game = game
         # self.image = pg.Surface((w, h))
-        self.image = self.game.spritesheet.get_image(0,256,64,16, 1)
+        self.image = self.game.spritesheet.get_image(0,256,128,16, 1, 1)
         self.image.set_colorkey(BLACK)
         # self.image.fill(WHITE)
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
-        self.mob = Monster(self.game)
-        self.mob.pos = self.rect.midtop
         self.spawn()
     def spawn(self):
-        # self.mob.animate()
-        self.game.all_sprites.add(self.mob)
+        self.mob = Monster(self.game)
+        self.mob.rect.midbottom = self.rect.midtop
         self.game.monsters.add(self.mob)
-        
+        self.game.all_sprites.add(self.mob)
     def update(self):
         # pass
         self.mob.animate()
-        self.mob.x = self.rect.x
-        self.mob.y = self.rect.y
-        # if self.mob.rect.x > self.rect.width:
-        #     self.mob.acc.x = -0.1
-        # if self.mob.rect.x < self.rect.x:
-        #     self.mob.acc.x = 0.1
-        # self.mob.vel += self.mob.acc
-        # self.mob.pos += self.mob.vel + 0.5 * self.mob.acc
-        # self.mob.acc = vec(0,0)
         self.mob.rect.midbottom = self.rect.midtop
 class Pewpew(Sprite):
     def __init__(self, game, x, y, w, h):
