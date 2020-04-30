@@ -6,7 +6,7 @@ WIDTH = 480
 HEIGHT = 600
 FPS = 60
 FONT_NAME = 'arial'
-SPRITESHEET = 'GameSprites.png'
+SPRITESHEET = 'GameSprites2.png'
 
 # Environment options
 GRAVITY = 9.8
