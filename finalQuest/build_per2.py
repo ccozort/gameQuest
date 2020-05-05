@@ -44,16 +44,57 @@ class Player(Sprite):
             self.speedx = -8
         if keystate[pg.K_d]:
             self.speedx = 8
+        if keystate[pg.K_w]:
+            self.pew()
         # if keystate[pg.K_w]:
         #     self.speedy = -8
         # if keystate[pg.K_s]:
         #     self.speedy = 8
         self.rect.x += self.speedx
         self.rect.y += self.speedy
+    def pew(self):
+        lazer = Lazer(self.rect.centerx, self.rect.top)
+class Mob(Sprite):
+    def __init__(self):
+        Sprite.__init__(self)
+        self.image = pg.Surface((30,30))
+        self.image.fill(YELLOW)
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randrange(0, WIDTH - self.rect.width)
+        self.rect.y = random.randrange(0, 250)
+        self.speedy = random.randrange(1, 10)
+        self.speedx = random.randrange(1, 8)
+    def update(self):
+        self.rect.x += self.speedx
+        # self.rect.y += self.speedy
+        if self.rect.top > HEIGHT + 10:
+            self.rect.y = 0
+        if self.rect.x > WIDTH or self.rect.x < 0:
+            self.speedx*=-1
+            self.rect.y += random.randrange(5,25)
+    
+
+class Lazer(Sprite):
+    def __init__(self, x, y):
+        Sprite.__init__(self)
+        self.image = pg.Surface((5,10))
+        self.image.fill(BLACK)
+        self.rect = self.image.get_rect()
+        self.rect.bottom = y
+        self.rect.centerx = x
+        self.speedy = -10
+    def update(self):
+        self.rect.y += self.speedy
 
 all_sprites = pg.sprite.Group()
+mobs = pg.sprite.Group()
 player = Player()
+mob = Mob()
 all_sprites.add(player)
+for i in range(8):
+    m = Mob()
+    all_sprites.add(m)
+    mobs.add(m)
 
 # game loop
 running = True

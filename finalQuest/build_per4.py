@@ -90,18 +90,17 @@ class Lazer(Sprite):
         if self.rect.bottom < 0:
             self.kill()
 
-# where all the new things get created...
+# where all the new things get created and grouped...
 all_sprites = pg.sprite.Group()
 mobs = pg.sprite.Group()
 lazers = pg.sprite.Group()
 player = Player()
-lazer = Lazer(player.rect.x, player.rect.y)
-all_sprites.add(lazer)
+all_sprites.add(player)
 for i in range(0,8):
     mob = Mob()
     all_sprites.add(mob)
     mobs.add(mob)
-all_sprites.add(player)
+
 
 # the game loop
 running = True
