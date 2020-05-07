@@ -6,6 +6,7 @@
 import pygame as pg
 from pygame.sprite import Sprite
 import random
+from os import path
 
 WIDTH = 480
 HEIGHT = 600
@@ -19,6 +20,15 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
+font_name = pg.font.match_font('arial')
+game_dir = path.join(path.dirname(__file__))
+
+# load all images...
+background_image = pg.image.load(game_dir + "/img/bg.png")
+background_rect = background_image.get_rect()
+background_rect2 = background_image.get_rect()
+player_image = pg.image.load(game_dir + "/img/player.png")
+mob_image = pg.image.load(game_dir + "/img/mob.png")
 
 # initialize pygame...
 pg.init()
@@ -27,19 +37,30 @@ screen = pg.display.set_mode((WIDTH, HEIGHT))
 pg.display.set_caption("Space Crusaders")
 clock = pg.time.Clock()
 
+# utils
+
+def draw_text(text, size, color, x, y):
+        font = pg.font.Font('arial', size)
+        text_surface = font.render(text, True, color)
+        text_rect = text_surface.get_rect()
+        text_rect.midtop = (int(x), int(y))
+        screen.blit(text_surface, text_rect)
+
 class Player(Sprite):
     def __init__(self):
         Sprite.__init__(self)
-        self.image = pg.Surface((50,40))
-        self.image.fill(GREEN)
+        self.image = pg.transform.scale(player_image, (50, 40))
+        self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.rect.centerx = WIDTH / 2
         self.rect.bottom = HEIGHT - 10
         self.speedx = 0
-        self.speedy = 0
+        self.speedy = 10
+        self.hitpoints = 100
+        self.ammo = 100
     def update(self):
         self.speedx = 0
-        self.speedy = 0
+        # self.speedy = 0
         keystate = pg.key.get_pressed()
         if keystate[pg.K_w]:
             self.pew()
@@ -52,17 +73,20 @@ class Player(Sprite):
         # if keystate[pg.K_s]:
         #     self.speedy = 8
         self.rect.x += self.speedx
-        self.rect.y += self.speedy
+        # self.rect.y += self.speedy
     def pew(self):
-        lazer = Lazer(self.rect.centerx, self.rect.top)
-        all_sprites.add(lazer)
-        lazers.add(lazer)
+        if self.ammo > 0:
+            lazer = Lazer(self.rect.centerx, self.rect.top)
+            all_sprites.add(lazer)
+            lazers.add(lazer)
+            self.ammo-=1
+            # print(self.ammo)
 
 class Mob(Sprite):
     def __init__(self):
         Sprite.__init__(self)
-        self.image = pg.Surface((40,40))
-        self.image.fill(YELLOW)
+        self.image = pg.transform.scale(mob_image, (20, 20))
+        self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.rect.x = random.randrange(0, WIDTH-self.rect.width)
         self.rect.y = random.randrange(0, 240)
@@ -119,9 +143,25 @@ while running:
     hits = pg.sprite.spritecollide(player, mobs, False)
     if hits:
         running = False
+    
+    if len(mobs) == 0:
+        for i in range(0,8):
+            mob = Mob()
+            all_sprites.add(mob)
+            mobs.add(mob)
+    
+    background_rect2.y = background_rect.y - 600
+    background_rect.y+= player.speedy
+    background_rect2.y+= player.speedy
 
+    if background_rect2.y >- 0:
+        background_rect.y = background_rect.y -600
+    
     # Draw
     screen.fill(DARKBLUE)
+    screen.blit(background_image, background_rect)
+    screen.blit(background_image, background_rect2)
+    draw_text(str(player.ammo), 22, WHITE, WIDTH/2, 15)
     all_sprites.draw(screen)
     pg.display.flip()
 

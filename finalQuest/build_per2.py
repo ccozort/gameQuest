@@ -5,6 +5,13 @@
 import pygame as pg
 from pygame.sprite import Sprite
 import random
+from os import path
+from pathlib import Path
+img_folder = Path("img")
+bg_img = img_folder / "bg.png"
+print(bg_img)
+
+game_dir = path.join(path.dirname(__file__))
 
 # global variables
 WIDTH = 480
@@ -26,10 +33,18 @@ screen = pg.display.set_mode((WIDTH, HEIGHT))
 pg.display.set_caption("Shmup!")
 clock = pg.time.Clock()
 
+# Load all game graphics
+background = pg.image.load(path.join(game_dir + "/img/bg.png")).convert()
+background_rect = background.get_rect()
+# player_img = pg.image.load(path.join(img_dir, "playerShip1_orange.png")).convert()
+# meteor_img = pg.image.load(path.join(img_dir, "meteorBrown_med1.png")).convert()
+# bullet_img = pg.image.load(path.join(img_dir, "laserRed16.png")).convert()
+
 class Player(Sprite):
     def __init__(self):
         Sprite.__init__(self)
         self.image = pg.Surface((50,40))
+        # self.image = pg.transform.scale(player_img, (50, 40))
         self.image.fill(GREEN)
         self.rect = self.image.get_rect()
         self.rect.centerx = WIDTH / 2
@@ -44,7 +59,7 @@ class Player(Sprite):
             self.speedx = -8
         if keystate[pg.K_d]:
             self.speedx = 8
-        if keystate[pg.K_w]:
+        if keystate[pg.K_SPACE]:
             self.pew()
         # if keystate[pg.K_w]:
         #     self.speedy = -8
@@ -54,6 +69,10 @@ class Player(Sprite):
         self.rect.y += self.speedy
     def pew(self):
         lazer = Lazer(self.rect.centerx, self.rect.top)
+        all_sprites.add(lazer)
+        lazers.add(lazer)
+        # print('trying to shoot..')
+
 class Mob(Sprite):
     def __init__(self):
         Sprite.__init__(self)
@@ -67,12 +86,11 @@ class Mob(Sprite):
     def update(self):
         self.rect.x += self.speedx
         # self.rect.y += self.speedy
-        if self.rect.top > HEIGHT + 10:
-            self.rect.y = 0
         if self.rect.x > WIDTH or self.rect.x < 0:
             self.speedx*=-1
             self.rect.y += random.randrange(5,25)
-    
+        if self.rect.top > HEIGHT + 10:
+            self.rect.y = 0        
 
 class Lazer(Sprite):
     def __init__(self, x, y):
@@ -85,11 +103,14 @@ class Lazer(Sprite):
         self.speedy = -10
     def update(self):
         self.rect.y += self.speedy
+        if self.rect.y < 0:
+            self.kill()
+            # print(len(lazers))
 
 all_sprites = pg.sprite.Group()
 mobs = pg.sprite.Group()
+lazers = pg.sprite.Group()
 player = Player()
-mob = Mob()
 all_sprites.add(player)
 for i in range(8):
     m = Mob()
@@ -110,8 +131,21 @@ while running:
     # Update the sprites in the game
     all_sprites.update()
 
+    hits = pg.sprite.spritecollide(player, mobs, False)
+
+    if hits:
+        running = False
+    
+    hits = pg.sprite.groupcollide(lazers, mobs, True, True)
+
+    if hits:
+        pass
+        # print('a lazer hit a mob')
+
+
     # Draw or render
     screen.fill(RED)
+    screen.blit(background, background_rect)
     all_sprites.draw(screen)
     pg.display.flip()
 
