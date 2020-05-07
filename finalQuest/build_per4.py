@@ -161,7 +161,7 @@ while running:
     screen.fill(DARKBLUE)
     screen.blit(background_image, background_rect)
     screen.blit(background_image, background_rect2)
-    draw_text(str(player.ammo), 22, WHITE, WIDTH/2, 15)
+    # draw_text(str(player.ammo), 22, WHITE, WIDTH/2, 15)
     all_sprites.draw(screen)
     pg.display.flip()
 
