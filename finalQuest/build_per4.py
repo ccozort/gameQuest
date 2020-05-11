@@ -11,7 +11,7 @@ from os import path
 WIDTH = 480
 HEIGHT = 600
 FPS = 60
-
+score = 0
 # define colors
 WHITE = (255, 255, 255)
 DARKBLUE = (39, 54, 77)
@@ -20,7 +20,6 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
-font_name = pg.font.match_font('arial')
 game_dir = path.join(path.dirname(__file__))
 
 # load all images...
@@ -38,13 +37,15 @@ pg.display.set_caption("Space Crusaders")
 clock = pg.time.Clock()
 
 # utils
+font_name = pg.font.match_font('arial')
 
-def draw_text(text, size, color, x, y):
-        font = pg.font.Font('arial', size)
-        text_surface = font.render(text, True, color)
-        text_rect = text_surface.get_rect()
-        text_rect.midtop = (int(x), int(y))
-        screen.blit(text_surface, text_rect)
+def draw_text(surf, text, size, x, y):
+    font = pg.font.Font(font_name, size)
+    text_surface = font.render(text, True, WHITE)
+    text_rect = text_surface.get_rect()
+    text_rect.midtop = (x, y)
+    surf.blit(text_surface, text_rect)
+
 
 class Player(Sprite):
     def __init__(self):
@@ -62,8 +63,8 @@ class Player(Sprite):
         self.speedx = 0
         # self.speedy = 0
         keystate = pg.key.get_pressed()
-        if keystate[pg.K_w]:
-            self.pew()
+        # if keystate[pg.K_w]:
+        #     self.pew()
         if keystate[pg.K_a]:
             self.speedx = -8
         if keystate[pg.K_d]:
@@ -135,6 +136,9 @@ while running:
         # window x button
         if event.type == pg.QUIT:
             running = False
+        elif event.type == pg.KEYDOWN:
+            if event.key == pg.K_SPACE:
+                player.pew()
 
     # update
     all_sprites.update()
@@ -161,7 +165,10 @@ while running:
     screen.fill(DARKBLUE)
     screen.blit(background_image, background_rect)
     screen.blit(background_image, background_rect2)
-    # draw_text(str(player.ammo), 22, WHITE, WIDTH/2, 15)
+    draw_text(screen, str(score), 24, WIDTH / 2, 10)
+    draw_text(screen, str(player.ammo), 24, WIDTH / 4, 10)
+    draw_text(screen, str(player.hitpoints), 16, player.rect.x, player.rect.y)
+
     all_sprites.draw(screen)
     pg.display.flip()
 
