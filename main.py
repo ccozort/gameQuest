@@ -57,16 +57,20 @@ class Game:
         # start a new game
         self.all_sprites = Group()
         self.platforms = Group()
+        self.static_platforms = Group()
         self.posts = Group()
         self.player = Player(self)
         self.all_sprites.add(self.player)
-        ground = Platform(0, HEIGHT-40, WIDTH, 40)
+        ground = Platform(0, HEIGHT-40, WIDTH - 250, 40)
+        ground2 = Platform(300, HEIGHT-40, 300, 40)
         plat1 = Platform(200, 400, 150, 20)
         plat2 = Platform(150, 300, 150, 20)
-        plat3 = Platform(10, 200, 400, 20)
+        plat3 = Platform(10, 200, 150, 20)
         post1 = Post(WIDTH/2, HEIGHT-95, 20, 55)
         self.all_sprites.add(ground)
-        self.platforms.add(ground)
+        self.all_sprites.add(ground2)
+        self.static_platforms.add(ground)
+        self.static_platforms.add(ground2)
         self.all_sprites.add(plat1)
         self.platforms.add(plat1)
         self.all_sprites.add(plat2)
@@ -114,9 +118,22 @@ class Game:
             else:
                 self.player.vel.y = 0
                 self.player.pos.y = hits[0].rect.top+1
+        
+        hits = pg.sprite.spritecollide(self.player, self.static_platforms, False)
+        if hits:
+            self.player.vel.y = 0
+            self.player.pos.y = hits[0].rect.top+1
         if posthits:
             self.player.hitpoints -= 0.5
             # print("hitpoints are now " + str(self.player.hitpoints))
+        if self.player.rect.x >= WIDTH / 1.25:
+            self.player.pos.x += int(abs(self.player.vel.x))
+            # self.player.pos.x = WIDTH / 1.25
+            for plat in self.platforms:
+                plat.rect.x -= int(abs(self.player.vel.x))
+                # if plat.rect.x < 0:
+                    # plat.kill()
+
 
     def draw(self):
         # Game Loop - draw

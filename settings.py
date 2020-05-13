@@ -11,7 +11,7 @@ GRAVITY = 9.8
 
 # Player properties
 PLAYER_ACC = 0.5
-PLAYER_FRICTION = -0.01
+PLAYER_FRICTION = -0.3
 PLAYER_JUMPPOWER = 10
 
 # define colors

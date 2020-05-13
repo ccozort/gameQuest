@@ -47,7 +47,9 @@ powerup_images = {}
 powerup_images['shield'] = pg.image.load(path.join(game_dir + "/img/power.png")).convert()
 powerup_images['gun'] = pg.image.load(path.join(game_dir + "/img/power.png")).convert()
 player_mini_img = pg.transform.scale(player_img, (25, 19))
+player_mini_img.set_colorkey(GREEN)
 
+print(player_mini_img)
 
 font_name = pg.font.match_font('arial')
 def draw_text(surf, text, size, x, y):
@@ -86,6 +88,7 @@ class Player(Sprite):
         Sprite.__init__(self)
         # self.image = pg.Surface((50,40))
         self.image = pg.transform.scale(player_img, (50, 40))
+        self.image.set_colorkey(GREEN)
         # self.image = player_img
         # self.image.fill(GREEN)
         self.rect = self.image.get_rect()
@@ -111,7 +114,7 @@ class Player(Sprite):
         # if keystate[pg.K_s]:
         #     self.speedy = 8
         self.rect.x += self.speedx
-        self.rect.y += self.speedy
+        # self.rect.y += self.speedy
     # taken and modified from Bradfield - power up method
     def powerup(self):
         self.power += 1
@@ -121,7 +124,14 @@ class Player(Sprite):
         all_sprites.add(lazer)
         lazers.add(lazer)
         # print('trying to shoot..')
-
+        if self.power >= 2:
+            lazer1 = Lazer(self.rect.left, self.rect.centery)
+            lazer2 = Lazer(self.rect.right, self.rect.centery)
+            all_sprites.add(lazer1)
+            all_sprites.add(lazer2)
+            lazers.add(lazer1)
+            lazers.add(lazer2)
+            # shoot_sound.play()
 class Pow(Sprite):
     def __init__(self, center):
         Sprite.__init__(self)
@@ -131,7 +141,7 @@ class Pow(Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = center
         self.speedy = 5
-
+        print(self.type)
     def update(self):
         self.rect.y += self.speedy
         # kill if it moves off the top of the screen
@@ -257,15 +267,15 @@ while running:
             all_sprites.add(m)
             mobs.add(m)
 
-    # for m in mobs:
-    #     lhits = pg.sprite.spritecollide(m, lazers, False)
-    #     if lhits:
-    #         m.hitpoints-=1
-    #         # print(m.hitpoints)
-    #         if random.random() > 0.9:
-    #             pow = Pow(hit.rect.center)
-    #             all_sprites.add(pow)
-    #             powerups.add(pow)
+    for m in mobs:
+        lhits = pg.sprite.spritecollide(m, lazers, False)
+        if lhits:
+            m.hitpoints-=1
+            # print(m.hitpoints)
+            if random.random() > 0.9:
+                pow = Pow(hit.rect.center)
+                all_sprites.add(pow)
+                powerups.add(pow)
 
     # check to see if player hit a powerup
     hits = pg.sprite.spritecollide(player, powerups, True)
@@ -289,6 +299,7 @@ while running:
     # Draw or render
     screen.fill(RED)
     screen.blit(background, background_rect)
+    screen.blit(background, background_rect2)
     draw_shield_bar(screen, 5, 5, player.shield)
     draw_lives(screen, WIDTH - 100, 5, player.lives, player_mini_img)
     all_sprites.draw(screen)

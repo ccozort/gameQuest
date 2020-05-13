@@ -25,8 +25,9 @@ class Player(Sprite):
     def jump(self):
         self.rect.x += 1
         hits = pg.sprite.spritecollide(self, self.game.platforms, False)
+        ghits = pg.sprite.spritecollide(self, self.game.static_platforms, False)
         self.rect.x -= 1
-        if hits: 
+        if hits or ghits: 
             self.vel.y = -15
     def update(self):
         self.acc = vec(0, 0.5)

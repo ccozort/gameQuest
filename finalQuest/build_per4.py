@@ -25,6 +25,7 @@ game_dir = path.join(path.dirname(__file__))
 # load all images...
 background_image = pg.image.load(game_dir + "/img/bg.png")
 background_rect = background_image.get_rect()
+# setup a second background for scrolling - feature added by Chris Cozort
 background_rect2 = background_image.get_rect()
 player_image = pg.image.load(game_dir + "/img/player.png")
 mob_image = pg.image.load(game_dir + "/img/mob.png")
@@ -154,11 +155,13 @@ while running:
             all_sprites.add(mob)
             mobs.add(mob)
     
+    # code below creates scrolling background using player speed on the y axis
     background_rect2.y = background_rect.y - 600
     background_rect.y+= player.speedy
     background_rect2.y+= player.speedy
 
-    if background_rect2.y >- 0:
+    # when background rect2 swap background on top
+    if background_rect2.y >= 0:
         background_rect.y = background_rect.y -600
     
     # Draw
